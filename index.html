@@ -199,18 +199,17 @@ function displayProducts(items) {
         `;
     });
 }
-
-    function searchProducts() {
+function searchProducts() {
     const query = document.getElementById("searchInput").value.trim().toLowerCase();
 
     const filtered = products.filter(product =>
-        product.name.toLowerCase().includes(query)
+        product.name.toLowerCase() === query
     );
 
     displayProducts(filtered);
-    }
+}
 
-     function addToCart(id) {
+ function addToCart(id) {
     const product = products.find(item => item.id === id);
     const existing = cart.find(item => item.id === id);
 
