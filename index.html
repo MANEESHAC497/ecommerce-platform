@@ -203,8 +203,9 @@ function searchProducts() {
     const query = document.getElementById("searchInput").value.trim().toLowerCase();
 
     const filtered = products.filter(product =>
-        product.name.toLowerCase() === query
-    );
+     product.name.toLowerCase().includes(query)
+
+      );
 
     displayProducts(filtered);
 }
