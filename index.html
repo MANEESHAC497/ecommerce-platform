@@ -169,15 +169,7 @@ footer {
 </footer>
 
 <script>
-
-const products = [
-    {id: 1, name: "Headphones", price: 999, emoji: "🎧"},
-    {id: 2, name: "Smart Watch", price: 1499, emoji: "⌚"},
-    {id: 3, name: "Shoes", price: 1999, emoji: "👟"},
-    {id: 4, name: "Backpack", price: 799, emoji: "🎒"},
-    {id: 5, name: "Camera", price: 4999, emoji: "📷"},
-    {id: 6, name: "Phone", price: 8999, emoji: "📱"}
-];
+    let products = [];
 
 let cart = [];
 
@@ -199,6 +191,41 @@ function displayProducts(items) {
         `;
     });
 }
+async function loadProducts() {
+    try {
+        const response = await fetch(
+            "https://ecommerce-platform-api-ffnj.onrender.com/api/products"
+        );
+
+        if (!response.ok) {
+            throw new Error("Failed to load products");
+        }
+
+        const data = await response.json();
+
+        const emojis = {
+            1: "🎧",
+            2: "⌚",
+            3: "👟",
+            4: "🎒",
+            5: "📷",
+            6: "📱"
+        };
+
+        products = data.map(product => ({
+            ...product,
+            emoji: emojis[product.id] || "🛍️"
+        }));
+
+        displayProducts(products);
+
+    } catch (error) {
+        document.getElementById("productList").innerHTML =
+            "<p>Products loading failed. Please try again.</p>";
+
+        console.log(error);
+    }
+}  
 function searchProducts() {
     const query = document.getElementById("searchInput").value.trim().toLowerCase();
 
@@ -270,8 +297,7 @@ function checkout() {
     cart = [];
     displayCart();
 }
-
-displayProducts(products);
+    loadProducts();
 displayCart();
 
 </script>
