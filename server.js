@@ -399,6 +399,27 @@ res.json({
     }
 });
 
+// User Profile API
+app.get("/api/profile", authenticateToken, async (req, res) => {
+    try {
+        const user = await User.findById(req.user.userId)
+            .select("-password");
+
+        if (!user) {
+            return res.status(404).json({
+                message: "User not found"
+            });
+        }
+
+        res.json(user);
+
+    } catch (error) {
+        res.status(500).json({
+            message: "Failed to fetch profile"
+        });
+    }
+});
+
 // Connect MongoDB and insert products if collection is empty
 mongoose.connect(process.env.MONGODB_URI)
     .then(async () => {
