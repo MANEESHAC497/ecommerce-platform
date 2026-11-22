@@ -55,6 +55,63 @@ app.get("/api/products", async (req, res) => {
         });
     }
 });
+// Add product to cart
+app.post("/api/cart/add", async (req, res) => {
+    try {
+        const { cartId, productId, quantity } = req.body;
+        
+if (!cartId || !Number.isInteger(Number(productId)) ||
+    (quantity !== undefined && (!Number.isInteger(Number(quantity)) || Number(quantity) < 1))) {
+    return res.status(400).json({
+        message: "Invalid cart details"
+    });
+}
+
+        const product = await Product.findOne({ id: productId });
+
+        if (!product) {
+            return res.status(404).json({
+                message: "Product not found"
+            });
+        }
+
+        let cart = await Cart.findOne({ cartId });
+
+        if (!cart) {
+            cart = new Cart({
+                cartId,
+                items: []
+            });
+        }
+
+        const existingItem = cart.items.find(
+            item => item.productId === productId
+        );
+
+        if (existingItem) {
+            existingItem.quantity += quantity || 1;
+        } else {
+            cart.items.push({
+                productId: product.id,
+                name: product.name,
+                price: product.price,
+                quantity: quantity || 1
+            });
+        }
+
+        await cart.save();
+
+        res.json({
+            message: "Product added to cart",
+            cart
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            message: "Failed to add product"
+        });
+    }
+});
 
 // Connect MongoDB and insert products if collection is empty
 mongoose.connect(process.env.MONGODB_URI)
