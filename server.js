@@ -313,6 +313,62 @@ app.post("/api/register", async (req, res) => {
 });
 
 
+// User Login API
+app.post("/api/login", async (req, res) => {
+    try {
+        const { email, password } = req.body;
+
+        if (!email || !password) {
+            return res.status(400).json({
+                message: "Email and password are required"
+            });
+        }
+
+        const user = await User.findOne({
+            email: email.toLowerCase().trim()
+        });
+
+        if (!user) {
+            return res.status(401).json({
+                message: "Invalid email or password"
+            });
+        }
+
+        const [salt, storedHash] = user.password.split(":");
+
+        const loginHash = crypto.scryptSync(
+            password,
+            salt,
+            64
+        );
+
+        const savedHash = Buffer.from(storedHash, "hex");
+
+        if (
+            savedHash.length !== loginHash.length ||
+            !crypto.timingSafeEqual(savedHash, loginHash)
+        ) {
+            return res.status(401).json({
+                message: "Invalid email or password"
+            });
+        }
+
+        res.json({
+            message: "Login successful",
+            user: {
+                id: user._id,
+                name: user.name,
+                email: user.email
+            }
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            message: "Login failed"
+        });
+    }
+});
+
 // Connect MongoDB and insert products if collection is empty
 mongoose.connect(process.env.MONGODB_URI)
     .then(async () => {
