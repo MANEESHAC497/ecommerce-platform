@@ -28,6 +28,23 @@ const cartSchema = new mongoose.Schema({
 });
 
 const Cart = mongoose.model("Cart", cartSchema, "carts");
+// MongoDB Order Schema
+const orderSchema = new mongoose.Schema({
+    cartId: String,
+    items: [{
+        productId: Number,
+        name: String,
+        price: Number,
+        quantity: Number
+    }],
+    total: Number,
+    orderDate: {
+        type: Date,
+        default: Date.now
+    }
+});
+
+const Order = mongoose.model("Order", orderSchema, "orders");
 
 // Default Products
 const defaultProducts = [
