@@ -113,6 +113,29 @@ if (!cartId || !Number.isInteger(Number(productId)) ||
     }
 });
 
+// Get cart items
+app.get("/api/cart/:cartId", async (req, res) => {
+    try {
+        const cart = await Cart.findOne({
+            cartId: req.params.cartId
+        });
+
+        if (!cart) {
+            return res.json({
+                message: "Cart is empty",
+                items: []
+            });
+        }
+
+        res.json(cart);
+
+    } catch (error) {
+        res.status(500).json({
+            message: "Failed to fetch cart"
+        });
+    }
+});
+
 // Connect MongoDB and insert products if collection is empty
 mongoose.connect(process.env.MONGODB_URI)
     .then(async () => {
