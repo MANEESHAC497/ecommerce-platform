@@ -334,8 +334,6 @@ app.post("/api/register", async (req, res) => {
         });
     }
 });
-
-
 // User Login API
 app.post("/api/login", async (req, res) => {
     try {
@@ -376,21 +374,21 @@ app.post("/api/login", async (req, res) => {
             });
         }
 
-const token = jwt.sign(
-    { userId: user._id },
-    process.env.JWT_SECRET,
-    { expiresIn: "1d" }
-);
+        const token = jwt.sign(
+            { userId: user._id },
+            process.env.JWT_SECRET,
+            { expiresIn: "1d" }
+        );
 
-res.json({
-    message: "Login successful",
-    token,
-    user: {
-        id: user._id,
-        name: user.name,
-        email: user.email
-    }
-});
+        res.json({
+            message: "Login successful",
+            token,
+            user: {
+                id: user._id,
+                name: user.name,
+                email: user.email
+            }
+        });
 
     } catch (error) {
         res.status(500).json({
