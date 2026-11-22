@@ -183,6 +183,52 @@ app.delete("/api/cart/:cartId/:productId", async (req, res) => {
         });
     }
 });
+// Place Order API
+app.post("/api/orders", async (req, res) => {
+    try {
+        const { cartId } = req.body;
+
+        if (!cartId) {
+            return res.status(400).json({
+                message: "Cart ID is required"
+            });
+        }
+
+        const cart = await Cart.findOne({ cartId });
+
+        if (!cart || cart.items.length === 0) {
+            return res.status(400).json({
+                message: "Cart is empty"
+            });
+        }
+
+        const total = cart.items.reduce(
+            (sum, item) => sum + item.price * item.quantity,
+            0
+        );
+
+        const order = new Order({
+            cartId,
+            items: cart.items,
+            total
+        });
+
+        await order.save();
+
+        cart.items = [];
+        await cart.save();
+
+        res.json({
+            message: "Order placed successfully",
+            order
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            message: "Failed to place order"
+        });
+    }
+});
 
 // Connect MongoDB and insert products if collection is empty
 mongoose.connect(process.env.MONGODB_URI)
