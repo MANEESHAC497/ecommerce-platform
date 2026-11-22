@@ -8,6 +8,28 @@ const app = express();
 
 app.use(cors());
 app.use(express.json());
+// Authentication Middleware
+function authenticateToken(req, res, next) {
+    const authHeader = req.headers["authorization"];
+    const token = authHeader && authHeader.split(" ")[1];
+
+    if (!token) {
+        return res.status(401).json({
+            message: "Access denied. Token required."
+        });
+    }
+
+    jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+        if (err) {
+            return res.status(403).json({
+                message: "Invalid token"
+            });
+        }
+
+        req.user = user;
+        next();
+    });
+}
 
 // MongoDB Product Schema
 const productSchema = new mongoose.Schema({
