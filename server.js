@@ -16,6 +16,19 @@ const productSchema = new mongoose.Schema({
 
 const Product = mongoose.model("Product", productSchema, "products");
 
+// MongoDB Cart Schema
+const cartSchema = new mongoose.Schema({
+    cartId: String,
+    items: [{
+        productId: Number,
+        name: String,
+        price: Number,
+        quantity: Number
+    }]
+});
+
+const Cart = mongoose.model("Cart", cartSchema, "carts");
+
 // Default Products
 const defaultProducts = [
     { id: 1, name: "Headphones", price: 999 },
