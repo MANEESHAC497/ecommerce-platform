@@ -136,6 +136,37 @@ app.get("/api/cart/:cartId", async (req, res) => {
     }
 });
 
+// Remove product from cart
+app.delete("/api/cart/:cartId/:productId", async (req, res) => {
+    try {
+        const cart = await Cart.findOne({
+            cartId: req.params.cartId
+        });
+
+        if (!cart) {
+            return res.status(404).json({
+                message: "Cart not found"
+            });
+        }
+
+        cart.items = cart.items.filter(
+            item => item.productId !== Number(req.params.productId)
+        );
+
+        await cart.save();
+
+        res.json({
+            message: "Product removed from cart",
+            cart
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            message: "Failed to remove product"
+        });
+    }
+});
+
 // Connect MongoDB and insert products if collection is empty
 mongoose.connect(process.env.MONGODB_URI)
     .then(async () => {
