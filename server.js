@@ -112,15 +112,20 @@ app.get("/api/products", async (req, res) => {
 app.post("/api/cart/add", async (req, res) => {
     try {
         const { cartId, productId, quantity } = req.body;
-        
-if (!cartId || !Number.isInteger(Number(productId)) ||
-    (quantity !== undefined && (!Number.isInteger(Number(quantity)) || Number(quantity) < 1))) {
+        if (
+    typeof cartId !== "string" ||
+    cartId.trim() === "" ||
+    !Number.isInteger(Number(productId)) ||
+    Number(productId) < 1 ||
+    (quantity !== undefined &&
+        (!Number.isInteger(Number(quantity)) || Number(quantity) < 1))
+) {
     return res.status(400).json({
         message: "Invalid cart details"
     });
-}
-
-        const product = await Product.findOne({ id: productId });
+        }
+        
+const product = await Product.findOne({ id: productId });
 
         if (!product) {
             return res.status(404).json({
