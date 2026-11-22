@@ -259,6 +259,60 @@ app.get("/api/orders/:cartId", async (req, res) => {
     }
 });
 
+// User Registration API
+app.post("/api/register", async (req, res) => {
+    try {
+        const { name, email, password } = req.body;
+
+        if (!name || !email || !password || password.length < 8) {
+            return res.status(400).json({
+                message: "Enter valid details. Password must be at least 8 characters."
+            });
+        }
+
+        const existingUser = await User.findOne({
+            email: email.toLowerCase().trim()
+        });
+
+        if (existingUser) {
+            return res.status(400).json({
+                message: "Email already registered"
+            });
+        }
+
+        const salt = crypto.randomBytes(16).toString("hex");
+
+        const hashedPassword = crypto.scryptSync(
+            password,
+            salt,
+            64
+        ).toString("hex");
+
+        const user = new User({
+            name,
+            email: email.toLowerCase().trim(),
+            password: salt + ":" + hashedPassword
+        });
+
+        await user.save();
+
+        res.status(201).json({
+            message: "Registration successful",
+            user: {
+                id: user._id,
+                name: user.name,
+                email: user.email
+            }
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            message: "Registration failed"
+        });
+    }
+});
+
+
 // Connect MongoDB and insert products if collection is empty
 mongoose.connect(process.env.MONGODB_URI)
     .then(async () => {
