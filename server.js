@@ -230,6 +230,22 @@ app.post("/api/orders", async (req, res) => {
     }
 });
 
+// Get Order History API
+app.get("/api/orders/:cartId", async (req, res) => {
+    try {
+        const orders = await Order.find({
+            cartId: req.params.cartId
+        }).sort({ orderDate: -1 });
+
+        res.json(orders);
+
+    } catch (error) {
+        res.status(500).json({
+            message: "Failed to fetch orders"
+        });
+    }
+});
+
 // Connect MongoDB and insert products if collection is empty
 mongoose.connect(process.env.MONGODB_URI)
     .then(async () => {
