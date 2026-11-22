@@ -354,16 +354,23 @@ app.post("/api/login", async (req, res) => {
             });
         }
 
-        res.json({
-            message: "Login successful",
-            user: {
-                id: user._id,
-                name: user.name,
-                email: user.email
-            }
-        });
+const token = jwt.sign(
+    { userId: user._id },
+    process.env.JWT_SECRET,
+    { expiresIn: "1d" }
+);
 
-    } catch (error) {
+res.json({
+    message: "Login successful",
+    token,
+    user: {
+        id: user._id,
+        name: user.name,
+        email: user.email
+    }
+});
+
+    catch (error) {
         res.status(500).json({
             message: "Login failed"
         });
