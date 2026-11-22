@@ -169,9 +169,16 @@ footer {
 </footer>
 
 <script>
-    let products = [];
+    let products = [
+    {id: 1, name: "Headphones", price: 999, emoji: "🎧"},
+    {id: 2, name: "Smart Watch", price: 1499, emoji: "⌚"},
+    {id: 3, name: "Shoes", price: 1999, emoji: "👟"},
+    {id: 4, name: "Backpack", price: 799, emoji: "🎒"},
+    {id: 5, name: "Camera", price: 4999, emoji: "📷"},
+    {id: 6, name: "Phone", price: 8999, emoji: "📱"}
+];
 
-let cart = [];
+    let cart = [];
 
 function displayProducts(items) {
     const productList = document.getElementById("productList");
