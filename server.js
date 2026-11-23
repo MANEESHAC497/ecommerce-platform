@@ -108,24 +108,29 @@ app.get("/api/products", async (req, res) => {
         });
     }
 });
+
 // Add product to cart
 app.post("/api/cart/add", async (req, res) => {
     try {
         const { cartId, productId, quantity } = req.body;
+
+        const pid = Number(productId);
+        const qty = quantity === undefined ? 1 : Number(quantity);
+
         if (
-    typeof cartId !== "string" ||
-    cartId.trim() === "" ||
-    !Number.isInteger(Number(productId)) ||
-    Number(productId) < 1 ||
-    (quantity !== undefined &&
-        (!Number.isInteger(Number(quantity)) || Number(quantity) < 1))
-) {
-    return res.status(400).json({
-        message: "Invalid cart details"
-    });
+            typeof cartId !== "string" ||
+            cartId.trim() === "" ||
+            !Number.isInteger(pid) ||
+            pid < 1 ||
+            !Number.isInteger(qty) ||
+            qty < 1
+        ) {
+            return res.status(400).json({
+                message: "Invalid cart details"
+            });
         }
-        
-const product = await Product.findOne({ id: productId });
+
+        const product = await Product.findOne({ id: pid });
 
         if (!product) {
             return res.status(404).json({
@@ -133,27 +138,27 @@ const product = await Product.findOne({ id: productId });
             });
         }
 
-        let cart = await Cart.findOne({ cartId });
+        let cart = await Cart.findOne({ cartId: cartId.trim() });
 
         if (!cart) {
             cart = new Cart({
-                cartId,
+                cartId: cartId.trim(),
                 items: []
             });
         }
 
         const existingItem = cart.items.find(
-            item => item.productId === productId
+            item => Number(item.productId) === pid
         );
 
         if (existingItem) {
-            existingItem.quantity += quantity || 1;
+            existingItem.quantity += qty;
         } else {
             cart.items.push({
                 productId: product.id,
                 name: product.name,
                 price: product.price,
-                quantity: quantity || 1
+                quantity: qty
             });
         }
 
@@ -166,7 +171,8 @@ const product = await Product.findOne({ id: productId });
 
     } catch (error) {
         res.status(500).json({
-            message: "Failed to add product"
+            message: "Failed to add product",
+            error: error.message
         });
     }
 });
