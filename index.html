@@ -264,6 +264,7 @@ async function addToCart(id) {
         }
 
         alert("Product added to cart successfully!");
+        await displayCart();
 
     } catch (error) {
         alert(error.message);
