@@ -352,7 +352,43 @@ async function displayCart() {
         cartItems.innerHTML = "Failed to load cart.";
     }
 }
-    
+
+
+async function loadOrderHistory() {
+    const orderHistory = document.getElementById("orderHistory");
+
+    try {
+        const response = await fetch(
+            "https://ecommerce-platform-api-ffnj.onrender.com/api/orders/cart101"
+        );
+
+        const orders = await response.json();
+
+        if (!response.ok) {
+            throw new Error("Failed to load orders");
+        }
+
+        if (orders.length === 0) {
+            orderHistory.innerHTML = "<p>No orders found.</p>";
+            return;
+        }
+
+        orderHistory.innerHTML = orders.map(order => `
+            <div class="cart-item">
+                <h3>Order Details</h3>
+                <p>Total: ₹${order.total}</p>
+                <p>Date: ${new Date(order.orderDate).toLocaleString()}</p>
+                <p>Products:</p>
+                ${order.items.map(item => `
+                    <p>${item.name} × ${item.quantity}</p>
+                `).join("")}
+            </div>
+        `).join("");
+
+    } catch (error) {
+        orderHistory.innerHTML = "<p>Failed to load order history.</p>";
+    }
+}  
 async function checkout() {
     try {
         const response = await fetch(
