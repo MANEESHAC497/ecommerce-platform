@@ -212,10 +212,9 @@ app.delete("/api/cart/:cartId/:productId", async (req, res) => {
                 message: "Cart not found"
             });
         }
-
-        cart.items = cart.items.filter(
-            item => item.productId !== Number(req.params.productId)
-        );
+            cart.items = cart.items.filter(
+    item => Number(item.productId) !== Number(req.params.productId)
+);
 
         await cart.save();
 
